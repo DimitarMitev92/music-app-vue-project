@@ -7,11 +7,7 @@
   >
     {{ reg_alert_msg }}
   </div>
-  <vee-form
-    :validation-schema="schema"
-    @submit="register"
-    :initial-values="userData"
-  >
+  <vee-form :validation-schema="schema" @submit="register" :initial-values="userData">
     <!-- Name -->
     <div class="mb-3">
       <label class="inline-block mb-2">Name</label>
@@ -107,40 +103,46 @@
 </template>
 
 <script>
+import firebase from '@/includes/firebase.js'
+
 export default {
-  name: "RegisterForm",
+  name: 'RegisterForm',
   data() {
     return {
-      tab: "login",
+      tab: 'login',
       schema: {
-        name: "required|min:3|max:100|alpha_spaces",
-        email: "required|min:3|max:100|email",
-        age: "required|min_value:18|max_value:100",
-        password: "required|min:9|max:100|excluded:password",
-        confirm_password: "passwords_mismatch:@password",
-        country: "required|country_excluded:Antarctica",
-        tos: "tos",
+        name: 'required|min:3|max:100|alpha_spaces',
+        email: 'required|min:3|max:100|email',
+        age: 'required|min_value:18|max_value:100',
+        password: 'required|min:9|max:100|excluded:password',
+        confirm_password: 'passwords_mismatch:@password',
+        country: 'required|country_excluded:Antarctica',
+        tos: 'tos'
       },
       userData: {
-        country: "USA",
+        country: 'USA'
       },
       reg_in_submission: false,
       reg_show_alert: false,
-      reg_alert_variant: "bg-blue-500",
-      reg_alert_msg: "Please wait! Your account is being created.",
-    };
+      reg_alert_variant: 'bg-blue-500',
+      reg_alert_msg: 'Please wait! Your account is being created.'
+    }
   },
   methods: {
-    register(values) {
-      this.reg_show_alert = true;
-      this.reg_in_submission = true;
-      this.reg_alert_variant = "bg-blue-500";
-      this.reg_alert_msg = "Please wait! Your account is being created.";
+    async register(values) {
+      this.reg_show_alert = true
+      this.reg_in_submission = true
+      this.reg_alert_variant = 'bg-blue-500'
+      this.reg_alert_msg = 'Please wait! Your account is being created.'
 
-      this.reg_alert_variant = "bg-green-500";
-      this.reg_alert_msg = "Success! Your account has been created.";
-      console.log(values);
-    },
-  },
-};
+      const userCred = await firebase
+        .auth()
+        .createUserWithEmailAndPassword(values.email, values.password)
+
+      this.reg_alert_variant = 'bg-green-500'
+      this.reg_alert_msg = 'Success! Your account has been created.'
+      console.log(values)
+    }
+  }
+}
 </script>
