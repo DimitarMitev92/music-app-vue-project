@@ -103,7 +103,7 @@
 </template>
 
 <script>
-import firebase from '@/includes/firebase.js'
+import { auth, userCollection } from '@/includes/firebase.js'
 
 export default {
   name: 'RegisterForm',
@@ -137,13 +137,24 @@ export default {
 
       let userCred = null
       try {
-        userCred = await firebase
-          .auth()
-          .createUserWithEmailAndPassword(values.email, values.password)
+        userCred = await auth.createUserWithEmailAndPassword(values.email, values.password)
       } catch (error) {
         this.reg_in_submission = false
         this.reg_alert_variant = 'bg-red-500'
-        this.reg_alert_msg = `An unexpected error occured. Please try again late`
+        this.reg_alert_msg = `An unexpected error occured. Please try again later`
+        return
+      }
+      try {
+        await userCollection.add({
+          name: values.name,
+          email: values.email,
+          age: values.age,
+          country: values.country
+        })
+      } catch (error) {
+        this.reg_in_submission = false
+        this.reg_alert_variant = 'bg-red-500'
+        this.reg_alert_msg = `An unexpected error occured. Please try again later`
         return
       }
 
